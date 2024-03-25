@@ -70,7 +70,7 @@ defmodule Fcmex.TokenExtractor do
 
     {:ok, token, _} = Joken.encode_and_sign(payload, signer)
 
-    %{"access_token" => token} =
+    {:ok, %{"access_token" => token}} =
       HTTPoison.post(
         token_uri,
         Jason.encode!(%{
