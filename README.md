@@ -29,90 +29,19 @@ If `FCM_SERVER_KEY` is not found in your environment, it fallbacks to search fol
 
 ```elixir
 config :fcmex,
-  server_key: "a_example_key"
+  progect_id: "progect_id",
+  firebase_json_path: "path to json with service account data"
 ```
 
 - Send notification message to a device
 
 ```elixir
-{:ok, body} = Fcmex.push("user_token",
-  notification: %{
-    title: "foo",
-    body: "bar",
-    click_action: "open_foo",
-    icon: "new",
-  }
-)
-```
-
-- Send messsage to the topic
-
-```elixir
-{:ok, body} = Fcmex.push("/topics/topic_name",
-  notification: %{
-    title: "foo",
-    body: "bar",
-    click_action: "open_foo",
-    icon: "new",
-  }
-)
-```
-
-- Send data message to a device. Difference between notification message and data message is decribed in [here](https://firebase.google.com/docs/cloud-messaging/concept-options#notifications_and_data_messages).
-
-```elixir
-{:ok, body} = Fcmex.push("user_token",
-  data: %{
-    nick: "Mario",
-    body: "great match!",
-    room: "PortugalVSDenmark",
-  }
-)
-```
-
-- You can use notification, and data as custom key-value store
-
-```elixir
-{:ok, body} = Fcmex.push("user_token",
-  notification: %{
-    title: "foo",
-    body: "bar",
-    click_action: "open_foo",
-    icon: "new",
-  },
-  data: %{
-    nick: "Mario",
-    body: "great match!",
-    room: "PortugalVSDenmark",
-  }
-)
-```
-
-- Send message to multiple devices
-
-```elixir
-[ok: body] = Fcmex.push(["user_token", "user_token_2"],
-  notification: %{
-    title: "foo",
-    body: "bar",
-    click_action: "open_foo",
-    icon: "new",
-  }
-)
-```
-
-As the FCM limitation of multiple send at once is up to 1000, Fcmex chunks tokens to list of 1000 tokens.
-
-If specified tokens is over than 1000 tokens, then response is returned by keyword list chunked by every 1000 requests. (order is not guaranteed)
-
-```elixir
-[ok: result, ok: result2, ...]
-```
-
-If one of request goes something wrong (e.g. timeout, server error), then fcmex returns results with `:error` keyword.
-
-```elixir
-[ok: result, error: result2, ...]
+#any data from https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages#Notification
+{:ok, body} = Fcmex.push("topic:topic_name", %{"message" =>  %{"notification" => %{title: "title", body: "body"}}})
+#or
+{:ok, body} = Fcmex.push("token:token", %{"message" =>  %{"notification" => %{title: "title", body: "body"}}})
+#or
+{:ok, body} = Fcmex.push("condition:condition", %{"message" =>  %{"notification" => %{title: "title", body: "body"}}})
 ```
 
 - Topic subscription
@@ -154,39 +83,12 @@ iex> Fcmex.filter_unregistered_tokens(tokens)
 ["token1"]
 ```
 
-### Options
-
-You can use these options as well.
-
-- `priority`: `default: "high"`
-- `collapse_key`: `default: nil`
-- `time_to_live`: `default: nil`
-- `content_available`: `default: nil`
-
-```elixir
-Fcmex.push(["user_token", "user_token_2"],
-  notification: %{
-    title: "foo",
-    body: "bar",
-    click_action: "open_foo",
-    icon: "new",
-  },
-  priority: "normal",
-  collapse_key: "data",
-  time_to_live: 1000,
-  content_available: true
-)
-```
-
-A more detail of parameters are available on [Firebase doc page](https://firebase.google.com/docs/cloud-messaging/concept-options).
-
 ### Configuration
 
 You can set httpoison option as below.
 
 ```elixir
 config :fcmex,
-  fcm_server_key: {:system, "FCM_SERVER_KEY"} || System.get_env("FCM_SERVER_KEY"),
   httpoison_options: [ssl: [{:versions, [:'tlsv1.2']}], recv_timeout: 500]
 ```
 
@@ -205,15 +107,6 @@ end
 ```elixir
 # config/config.exs
 config :fcmex, :json_library, Jason
-```
-
-## Testing
-
-If you start contributing and you want to run mix test, first you need to export FCM_SERVER_KEY environment variable in the same shell as the one you will be running mix test in.
-
-```bash
-export FCM_SERVER_KEY="yourkey"
-mix test
 ```
 
 ## Contributing
