@@ -6,7 +6,7 @@ defmodule Fcmex.Request do
   use Retry
   alias Fcmex.{Util, Config, Payload}
 
-  @fcm_endpoint "https://fcm.googleapis.com/fcm/send"
+  @fcm_endpoint "https://fcm.googleapis.com/v1/projects/myproject-b5ae1/messages:send"
 
   def perform(to, opts) do
     with payload <- Payload.create(to, opts),
@@ -21,7 +21,10 @@ defmodule Fcmex.Request do
     retry with: exponential_backoff() |> randomize |> expiry(10_000) do
       HTTPoison.post(
         endpoint,
-        payload |> Config.json_library().encode!(),
+        %{
+          "message" => payload
+        }
+        |> Config.json_library().encode!(),
         Config.new(),
         Config.httpoison_options()
       )
