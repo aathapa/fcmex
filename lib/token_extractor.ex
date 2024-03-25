@@ -11,7 +11,7 @@ defmodule Fcmex.TokenExtractor do
   end
 
   def start_link(args) do
-    GenServer.start_link(__MODULE__, args)
+    GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   def get_token(), do: GenServer.call(__MODULE__, :get_token)
