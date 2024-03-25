@@ -10,6 +10,10 @@ defmodule Fcmex.TokenExtractor do
     {:ok, %{"credentials" => credentials, "token" => nil, "expires_after" => nil}}
   end
 
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args)
+  end
+
   def get_token(), do: GenServer.call(__MODULE__, :get_token)
 
   @impl true
