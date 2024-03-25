@@ -3,41 +3,25 @@ defmodule Fcmex.Payload do
     Create a payload
   "
 
-  defstruct [
-    :topic,
-    :registration_ids,
-    :notification,
-    :data,
-    :priority,
-    :time_to_live,
-    :collapse_key,
-    :content_available
-  ]
+  def create(to, payload) when is_binary(to) do
+    cond do
+      String.contains?(to, "topic:") ->
+        topic = String.replace(to, "topic:", "")
+        put_in(payload, ["message", "topic"], topic)
 
-  @defaults [
-    notification: %{},
-    data: %{},
-    priority: "high",
-    time_to_live: nil,
-    collapse_key: nil,
-    content_available: nil
-  ]
+      String.contains?(to, "token:") ->
+        token = String.replace(to, "token:", "")
+        put_in(payload, ["message", "token"], token)
 
-  def create(to, opts) do
-    %__MODULE__{}
-    |> Map.merge(opts(to, opts))
+      String.contains?(to, "condition:") ->
+        condition = String.replace(to, "condition:", "")
+        put_in(payload, ["message", "condition"], condition)
+    end
   end
 
-  def opts(to, opts) do
-    @defaults
-    |> put_destination(to)
-    |> Keyword.merge(opts)
-    |> Enum.reject(&(elem(&1, 1) |> is_nil))
-    |> Enum.into(%{})
-  end
-
-  def put_destination(opts, to) when is_binary(to), do: Keyword.merge(opts, topic: to)
-
-  def put_destination(opts, to) when is_list(to) and length(to) > 0,
-    do: Keyword.merge(opts, registration_ids: to)
+  def create(_to, _payload),
+    do:
+      raise(
+        "https://firebase.google.com/docs/cloud-messaging/send-message#send-messages-to-multiple-devices\nImportant: The send methods described in this section were deprecated on June 21, 2023, and will be removed in June 2024. For protocol, instead use the standard HTTP v1 API send method, implementing your own batch send by iterating through the list of recipients and sending to each recipient's token. For Admin SDK methods, make sure to update to the next major version. See the Firebase FAQ for more information."
+      )
 end
