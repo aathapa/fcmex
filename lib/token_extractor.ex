@@ -6,7 +6,7 @@ defmodule Fcmex.TokenExtractor do
 
   @impl true
   def init(service_account_json_path: path) do
-    credentials = Config.json_library().decode(File.read!(path))
+    credentials = Config.json_library().decode!(File.read!(path))
     {:ok, %{"credentials" => credentials, "token" => nil, "expires_after" => nil}}
   end
 
