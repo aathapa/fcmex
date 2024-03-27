@@ -19,7 +19,7 @@ defmodule Fcmex.Config do
   end
 
   def get_progect_id() do
-    Application.get_env(:fcmex, :progect_id) || raise("The progect_id must be specified")
+    Application.get_env(:fcmex, :progect_id, "")
   end
 
   def json_library do
