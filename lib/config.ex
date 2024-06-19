@@ -18,8 +18,8 @@ defmodule Fcmex.Config do
     Application.get_env(:fcmex, :httpoison_options, [])
   end
 
-  def get_progect_id() do
-    Application.get_env(:fcmex, :progect_id, "")
+  def get_project_id() do
+    Application.get_env(:fcmex, :project_id, "")
   end
 
   def json_library do

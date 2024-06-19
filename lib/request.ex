@@ -7,7 +7,7 @@ defmodule Fcmex.Request do
   alias Fcmex.{Util, Config, Payload}
 
   @fcm_endpoint "https://fcm.googleapis.com/v1/projects/:project_id/messages:send"
-                |> String.replace(":project_id", Config.get_progect_id())
+                |> String.replace(":project_id", Config.get_project_id())
 
   def perform(to, opts) do
     with payload <- Payload.create(to, opts),

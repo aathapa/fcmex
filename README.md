@@ -29,7 +29,7 @@ If `FCM_SERVER_KEY` is not found in your environment, it fallbacks to search fol
 
 ```elixir
 config :fcmex,
-  progect_id: "progect_id",
+  project_id: "project_id",
   firebase_json_path: "path to json with service account data"
 ```
 
