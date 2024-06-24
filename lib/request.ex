@@ -6,9 +6,6 @@ defmodule Fcmex.Request do
   use Retry
   alias Fcmex.{Util, Config, Payload}
 
-  @fcm_endpoint "https://fcm.googleapis.com/v1/projects/:project_id/messages:send"
-                |> String.replace(":project_id", Config.get_project_id())
-
   def perform(to, opts) do
     with payload <- Payload.create(to, opts),
          result <- post(payload) do
@@ -16,10 +13,15 @@ defmodule Fcmex.Request do
     end
   end
 
+  def fcm_endpoint do
+    project_id = Config.get_project_id()
+    "https://fcm.googleapis.com/v1/projects/#{project_id}/messages:send"
+  end
+
   defp post(payload) do
     retry with: exponential_backoff() |> randomize |> expiry(10_000) do
       HTTPoison.post(
-        @fcm_endpoint,
+        fcm_endpoint(),
         payload
         |> Config.json_library().encode!(),
         Config.new(),
