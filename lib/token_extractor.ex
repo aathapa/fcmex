@@ -5,8 +5,12 @@ defmodule Fcmex.TokenExtractor do
   @firebase_scope "https://www.googleapis.com/auth/firebase.messaging"
 
   @impl true
-  def init(service_account_json_path: path) do
-    credentials = Config.json_library().decode!(File.read!(path))
+  def init(_) do
+    credentials =
+      Config.get_service_json_path()
+      |> File.read!()
+      |> Config.json_library().decode!()
+
     {:ok, %{"credentials" => credentials, "token" => nil, "expires_after" => nil}}
   end
 
@@ -18,7 +22,8 @@ defmodule Fcmex.TokenExtractor do
 
   @impl true
   def handle_call({:get_token, scopes}, _from, %{"credentials" => credentials, "token" => nil}) do
-    %{"access_token" => token, "expires_after" => expires_after} = get_new_token(credentials, scopes)
+    %{"access_token" => token, "expires_after" => expires_after} =
+      get_new_token(credentials, scopes)
 
     {:reply, token,
      %{"credentials" => credentials, "token" => token, "expires_after" => expires_after}}
@@ -46,11 +51,14 @@ defmodule Fcmex.TokenExtractor do
     {:reply, state["token"], state}
   end
 
-  defp get_new_token(%{
-         "client_email" => service_account_email,
-         "private_key" => private_key,
-         "token_uri" => token_uri
-       }, scopes) do
+  defp get_new_token(
+         %{
+           "client_email" => service_account_email,
+           "private_key" => private_key,
+           "token_uri" => token_uri
+         },
+         scopes
+       ) do
     now_seconds = :os.system_time(:seconds)
     expires_after = now_seconds + 60 * 59
 

@@ -22,6 +22,10 @@ defmodule Fcmex.Config do
     Application.get_env(:fcmex, :project_id, "")
   end
 
+  def get_service_json_path do
+    Application.get_env(:fcmex, :service_account_json_path, "")
+  end
+
   def json_library do
     Application.get_env(:fcmex, :json_library, Poison)
   end
